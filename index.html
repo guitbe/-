@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="연봉 실수령액 계산기, 퇴직금 계산기, 세금 계산기 등 다양한 급여 계산 도구를 제공합니다.">
+    <meta name="keywords" content="연봉계산기, 실수령액, 급여계산기, 퇴직금계산기, 세금계산기">
+    <title>연봉 실수령액 계산기 | 급여 계산 도구</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Google AdSense 코드 (본인의 AdSense 발행자 ID로 교체하세요) -->
+    <!-- 발행자 ID는 ca-pub-로 시작하는 번호입니다 -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-여기에본인발행자ID넣기"
+     crossorigin="anonymous"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>💰 연봉 계산기</h1>
+            <p class="subtitle">실수령액부터 퇴직금까지, 모든 급여 계산을 한 번에!</p>
+        </div>
+    </header>
+
+    <nav class="tabs">
+        <div class="container">
+            <button class="tab-btn active" data-tab="salary">연봉 계산기</button>
+            <button class="tab-btn" data-tab="retirement">퇴직금 계산기</button>
+            <button class="tab-btn" data-tab="annual">연차수당 계산기</button>
+            <button class="tab-btn" data-tab="tax">세금 상세 분석</button>
+            <button class="tab-btn" data-tab="compare">연봉 비교</button>
+        </div>
+    </nav>
+
+    <!-- 상단 광고 영역 (AdSense) -->
+    <div class="container" style="margin-top: 1rem; margin-bottom: 1rem;">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-여기에본인발행자ID넣기"
+             data-ad-slot="여기에광고슬롯ID넣기"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </div>
+
+    <main class="container">
+        <!-- 연봉 계산기 탭 -->
+        <section id="salary" class="tab-content active">
+            <div class="calculator-card">
+                <h2>연봉 실수령액 계산기</h2>
+                <div class="form-group">
+                    <label for="annualSalary">연봉 (원)</label>
+                    <input type="number" id="annualSalary" placeholder="예: 50000000" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="familyCount">부양가족 수 (본인 포함)</label>
+                    <input type="number" id="familyCount" value="1" min="1" max="10">
+                </div>
+                <div class="form-group">
+                    <label for="hasInsurance">건강보험 납부 여부</label>
+                    <select id="hasInsurance">
+                        <option value="true">건강보험 납부</option>
+                        <option value="false">건강보험 미납부</option>
+                    </select>
+                </div>
+                <button class="btn-primary" onclick="calculateSalary()">계산하기</button>
+                
+                <div id="salaryResult" class="result-card" style="display: none;">
+                    <h3>💰 계산 결과</h3>
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <span class="label">월 급여</span>
+                            <span class="value" id="monthlySalary">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="label">4대보험</span>
+                            <span class="value" id="insurance">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="label">소득세</span>
+                            <span class="value" id="incomeTax">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="label">지방소득세</span>
+                            <span class="value" id="localTax">-</span>
+                        </div>
+                        <div class="result-item highlight">
+                            <span class="label">실수령액</span>
+                            <span class="value" id="netSalary">-</span>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="salaryChart"></canvas>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn-secondary" onclick="saveCalculation('salary')">💾 저장하기</button>
+                        <button class="btn-secondary" onclick="shareResult('salary')">📤 공유하기</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 퇴직금 계산기 탭 -->
+        <section id="retirement" class="tab-content">
+            <div class="calculator-card">
+                <h2>퇴직금 계산기</h2>
+                <div class="form-group">
+                    <label for="retirementSalary">평균임금 (월급여, 원)</label>
+                    <input type="number" id="retirementSalary" placeholder="예: 3000000" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="workYears">근무년수</label>
+                    <input type="number" id="workYears" placeholder="예: 5.5" step="0.1" min="0">
+                </div>
+                <button class="btn-primary" onclick="calculateRetirement()">계산하기</button>
+                
+                <div id="retirementResult" class="result-card" style="display: none;">
+                    <h3>💰 퇴직금 계산 결과</h3>
+                    <div class="result-grid">
+                        <div class="result-item highlight">
+                            <span class="label">퇴직금</span>
+                            <span class="value" id="retirementAmount">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="label">근무일수</span>
+                            <span class="value" id="workDays">-</span>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn-secondary" onclick="saveCalculation('retirement')">💾 저장하기</button>
+                        <button class="btn-secondary" onclick="shareResult('retirement')">📤 공유하기</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 연차수당 계산기 탭 -->
+        <section id="annual" class="tab-content">
+            <div class="calculator-card">
+                <h2>연차수당 계산기</h2>
+                <div class="form-group">
+                    <label for="annualSalary">월 급여 (원)</label>
+                    <input type="number" id="annualMonthlySalary" placeholder="예: 3000000" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="annualDays">연차일수</label>
+                    <input type="number" id="annualDays" placeholder="예: 15" min="0" max="25">
+                </div>
+                <button class="btn-primary" onclick="calculateAnnual()">계산하기</button>
+                
+                <div id="annualResult" class="result-card" style="display: none;">
+                    <h3>💰 연차수당 계산 결과</h3>
+                    <div class="result-grid">
+                        <div class="result-item highlight">
+                            <span class="label">연차수당</span>
+                            <span class="value" id="annualAmount">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="label">일 평균 급여</span>
+                            <span class="value" id="dailySalary">-</span>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn-secondary" onclick="saveCalculation('annual')">💾 저장하기</button>
+                        <button class="btn-secondary" onclick="shareResult('annual')">📤 공유하기</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 세금 상세 분석 탭 -->
+        <section id="tax" class="tab-content">
+            <div class="calculator-card">
+                <h2>세금 상세 분석</h2>
+                <div class="form-group">
+                    <label for="taxSalary">연봉 (원)</label>
+                    <input type="number" id="taxSalary" placeholder="예: 50000000" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="taxFamilyCount">부양가족 수 (본인 포함)</label>
+                    <input type="number" id="taxFamilyCount" value="1" min="1" max="10">
+                </div>
+                <button class="btn-primary" onclick="calculateTaxDetail()">분석하기</button>
+                
+                <div id="taxResult" class="result-card" style="display: none;">
+                    <h3>📊 세금 상세 분석</h3>
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <span class="label">과세표준</span>
+                            <span class="value" id="taxBase">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="label">소득세</span>
+                            <span class="value" id="taxIncomeTax">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="label">지방소득세</span>
+                            <span class="value" id="taxLocalTax">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="label">건강보험</span>
+                            <span class="value" id="taxHealth">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="label">국민연금</span>
+                            <span class="value" id="taxPension">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="label">고용보험</span>
+                            <span class="value" id="taxEmployment">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="label">산재보험</span>
+                            <span class="value" id="taxIndustrial">-</span>
+                        </div>
+                        <div class="result-item highlight">
+                            <span class="label">총 공제액</span>
+                            <span class="value" id="taxTotal">-</span>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="taxChart"></canvas>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn-secondary" onclick="saveCalculation('tax')">💾 저장하기</button>
+                        <button class="btn-secondary" onclick="shareResult('tax')">📤 공유하기</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 연봉 비교 탭 -->
+        <section id="compare" class="tab-content">
+            <div class="calculator-card">
+                <h2>연봉 비교</h2>
+                <div class="compare-inputs">
+                    <div class="form-group">
+                        <label for="compareSalary1">연봉 1 (원)</label>
+                        <input type="number" id="compareSalary1" placeholder="예: 40000000" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="compareSalary2">연봉 2 (원)</label>
+                        <input type="number" id="compareSalary2" placeholder="예: 50000000" min="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="compareFamilyCount">부양가족 수 (본인 포함)</label>
+                    <input type="number" id="compareFamilyCount" value="1" min="1" max="10">
+                </div>
+                <button class="btn-primary" onclick="compareSalaries()">비교하기</button>
+                
+                <div id="compareResult" class="result-card" style="display: none;">
+                    <h3>📊 연봉 비교 결과</h3>
+                    <div class="compare-grid">
+                        <div class="compare-item">
+                            <h4>연봉 1</h4>
+                            <div class="result-item">
+                                <span class="label">연봉</span>
+                                <span class="value" id="compare1Salary">-</span>
+                            </div>
+                            <div class="result-item highlight">
+                                <span class="label">실수령액</span>
+                                <span class="value" id="compare1Net">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="label">월 실수령액</span>
+                                <span class="value" id="compare1Monthly">-</span>
+                            </div>
+                        </div>
+                        <div class="compare-item">
+                            <h4>연봉 2</h4>
+                            <div class="result-item">
+                                <span class="label">연봉</span>
+                                <span class="value" id="compare2Salary">-</span>
+                            </div>
+                            <div class="result-item highlight">
+                                <span class="label">실수령액</span>
+                                <span class="value" id="compare2Net">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="label">월 실수령액</span>
+                                <span class="value" id="compare2Monthly">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="compare-difference">
+                        <h4>차이</h4>
+                        <div class="result-item highlight">
+                            <span class="label">연봉 차이</span>
+                            <span class="value" id="compareDiff">-</span>
+                        </div>
+                        <div class="result-item highlight">
+                            <span class="label">실수령액 차이</span>
+                            <span class="value" id="compareNetDiff">-</span>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="compareChart"></canvas>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn-secondary" onclick="saveCalculation('compare')">💾 저장하기</button>
+                        <button class="btn-secondary" onclick="shareResult('compare')">📤 공유하기</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 저장된 계산 내역 -->
+        <section class="saved-calculations">
+            <h2>💾 저장된 계산 내역</h2>
+            <div id="savedList" class="saved-list"></div>
+        </section>
+
+        <!-- 중간 광고 영역 (AdSense) -->
+        <div class="container" style="margin: 2rem 0;">
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-여기에본인발행자ID넣기"
+                 data-ad-slot="여기에광고슬롯ID넣기"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+
+        <!-- 정보 섹션 -->
+        <section class="info-section">
+            <h2>📚 급여 계산 가이드</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>4대보험 계산 방법</h3>
+                    <p>4대보험은 국민연금, 건강보험, 고용보험, 산재보험으로 구성됩니다. 각 보험료는 월 소득의 일정 비율로 계산됩니다.</p>
+                </div>
+                <div class="info-card">
+                    <h3>소득세 계산</h3>
+                    <p>소득세는 과세표준에 따라 누진세율이 적용됩니다. 부양가족 수에 따라 공제가 적용됩니다.</p>
+                </div>
+                <div class="info-card">
+                    <h3>퇴직금 계산</h3>
+                    <p>퇴직금은 평균임금 × 30일 × 근무년수로 계산됩니다. 1년 이상 근무한 경우 지급됩니다.</p>
+                </div>
+                <div class="info-card">
+                    <h3>연차수당</h3>
+                    <p>연차수당은 사용하지 않은 연차에 대해 일 평균 급여를 지급받는 것입니다.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 연봉 계산기. 모든 계산은 참고용이며, 실제와 다를 수 있습니다.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
